@@ -61,7 +61,7 @@ def doQuote(songs):
         print('- removing song with empty lyrics, ' + str(len(songs)) +
               ' songs remains\n')
 
-        return len(songs)
+    return len(songs)
 
 
 songs = loadSongs()
