@@ -21,7 +21,7 @@ class Song():
         self.year = rawSong[2]
         self.lyrics = [
             line for line in rawSong[3].replace('\n\n', '\n').replace(
-                '\\ n', ' ').split('\n') if len(line) > 20
+                '\\ n', ' ').split('\n') if len(line) > 20 # removing short lyric lines 
         ]
 
 
@@ -31,9 +31,9 @@ def sanitize(quote):
 
 def loadSongs():
     with open('./pink_floyd_lyrics.csv', newline='', encoding='utf-8') as f:
-        rawSongs = list(reader(f))
+        rawSongs = list(reader(f)) # loading and parsing CSV file
 
-    songs = [Song(rawSong) for rawSong in rawSongs if rawSong[3].strip() != '']
+    songs = [Song(rawSong) for rawSong in rawSongs if rawSong[3].strip() != ''] # removing songs no lyrics (instrumentals)
 
     return songs
 
