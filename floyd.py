@@ -76,3 +76,6 @@ while True:
         songs = loadSongs()
 
     sleep(interval - ((time() - startTime) % interval))
+
+# Mastodon verification
+# <a rel="me" href="https://botsin.space/@PinkFloydHourly">Mastodon</a>
