@@ -1,0 +1,4 @@
+# Don't forget to create virtual environment for packages: python3 -m venv .venv   
+# Then install dependencies: pip3 install -r requirements.txt   
+
+Mastodon.py==1.8.0
