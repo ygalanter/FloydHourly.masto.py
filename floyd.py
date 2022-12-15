@@ -1,7 +1,7 @@
 # Python version of Floyd Quotes bot
 
 from csv import reader
-from random import seed, randint
+from random import seed, randint, shuffle
 from datetime import datetime
 from re import sub
 from time import time, sleep
@@ -19,10 +19,10 @@ class Song():
         self.album = rawSong[0]
         self.title = rawSong[1]
         self.year = rawSong[2]
-        self.lyrics = [
-            line for line in rawSong[3].replace('\n\n', '\n').replace(
-                '\\ n', ' ').split('\n') if len(line) > 20
-        ]
+        self.lyrics = [line for line in rawSong[3].replace(
+            # removing short lines
+            '\n\n', '\n').replace('\\ n', ' ').split('\n') if len(line) > 20]
+        shuffle(self.lyrics)
 
 
 def sanitize(quote):
@@ -31,10 +31,14 @@ def sanitize(quote):
 
 def loadSongs():
     with open('./pink_floyd_lyrics.csv', newline='', encoding='utf-8') as f:
-        rawSongs = list(reader(f))
+        rawSongs = [rawSong for rawSong in list(
+            # Removing songs with empty lyrics (instrumentals)
+            reader(f)) if rawSong[3].strip() != '']
 
-    songs = [Song(rawSong) for rawSong in rawSongs if rawSong[3].strip() != '']
-
+    songs = [Song(rawSong)
+             # removing songs that only had short lyrics (that were removed)
+             for rawSong in rawSongs if len(Song(rawSong).lyrics) > 0]
+    shuffle(songs)
     return songs
 
 
@@ -42,19 +46,18 @@ def doQuote(songs):
     songIndex = randint(0, len(songs) - 1)
     song = songs[songIndex]
 
-    if len(song.lyrics) != 0:
-        lineIndex = randint(0, len(song.lyrics) - 1)
-        line = song.lyrics[lineIndex]
+    lineIndex = randint(0, len(song.lyrics) - 1)
+    line = song.lyrics[lineIndex]
 
-        toot = line + '\n\n' + '#' + sanitize(
-            song.title) + ' ' + '#' + sanitize(song.album) + ' ' + '#PinkFloyd'
-        print('\n' + datetime.now().strftime('%m/%d/%Y %H:%M') + ': ' + toot +
-              '\n')
-        mastodon.toot(toot)
+    toot = line + '\n\n' + '#' + sanitize(
+        song.title) + ' ' + '#' + sanitize(song.album) + ' ' + '#PinkFloyd'
+    print('\n' + datetime.now().strftime('%m/%d/%Y %H:%M') + ': ' + toot +
+          '\n')
+    mastodon.toot(toot)
 
-        del song.lyrics[lineIndex]
-        print('- ' + str(len(song.lyrics)) +
-              ' lyric lines remains in this song\n')
+    del song.lyrics[lineIndex]
+    print('- ' + str(len(song.lyrics)) +
+          ' lyric lines remains in this song\n')
 
     if len(song.lyrics) == 0:
         del songs[songIndex]
